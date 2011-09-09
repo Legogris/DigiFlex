@@ -1,4 +1,4 @@
-CM.Board = new Class({
+CM.Gate = new Class({
 	Implements: [Options],
 	options: {
 		onUpdate: function(options) {
@@ -8,11 +8,5 @@ CM.Board = new Class({
 	initialize: function(options) {
 		var self = this;
 		self.setOptions(options);
-	}
-});
-
-CM.Board.extend({
-	GameStates: {
-		STOPPED: 0
 	}
 });
