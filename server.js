@@ -5,7 +5,6 @@ var express = require('express'),
     conf = require('./conf'),
     browserify = require('browserify');
 
-
 var app = express.createServer  (
     express.bodyParser(),
     express.static(__dirname + "/public"),
@@ -60,7 +59,6 @@ var everyone = require('now').initialize(app);
 everyone.connected(function(){
   console.log("Joined: " + this.now.name);
 });
-
 
 everyone.disconnected(function(){
   console.log("Left: " + this.now.name);
