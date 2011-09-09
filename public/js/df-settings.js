@@ -2,7 +2,7 @@ if(CM === undefined) { var CM = {}; }
 
 CM.Settings = {
 	BackgroundColor: '#000',
-	ViewWidth: 600,
+	ViewWidth: 800,
 	ViewHeight: 600
 };
 

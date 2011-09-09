@@ -1,10 +1,44 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: 'Courier New';
+	background-color: #ccc;
+}
 li.gate {
-  cursor: hand;
-  cursor: pointer;
+	height: 70px;
 }
 div.gate {
-  width: 100px;
-  height: 100px;
+  width: 30px;
+  height: 30px;
   border: 1px dashed #222;
-  background-color: #ddd;
+  background-color: #eee;
+	position: absolute;
+	padding: 10px;
+	cursor: move;
+}
+
+.gate div.dragging {
+	background-color: #ddd;
+}
+select.input {
+	position: absolute;
+	left: -60px;
+	width: 60px;
+}
+
+span.output {
+	position: absolute;
+	right: -21px;
+	top: 16px;
+	background-color: #ccc;
+	width: 20px;
+}
+#dfArea {
+	background-color: #fff;
+	width: 800px;
+	height: 600px;
+	float: left;
+}
+#controlPanel {
+	float: left;
 }
