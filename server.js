@@ -39,7 +39,7 @@ app.get('/', function(req, res){
     res.render('home');
 });
 
-app.listen(8080);
+app.listen(80);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 // then just pass the server app handle to .listen()!

@@ -1,7 +1,7 @@
 {
   "author": "Legogris",
-  "name": "tictactoe",
-  "description": "Multiplayer online tic tac toe",
+  "name": "digiflex",
+  "description": "Web version of Chalmers DigiFlex",
   "version": "0.0.1",
   "repository": {
     "url": ""
