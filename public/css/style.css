@@ -1,0 +1,10 @@
+li.gate {
+  cursor: hand;
+  cursor: pointer;
+}
+div.gate {
+  width: 100px;
+  height: 100px;
+  border: 1px dashed #222;
+  background-color: #ddd;
+}
