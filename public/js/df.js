@@ -40,8 +40,8 @@ CM.UIManager = function() {
       });
       CM.UIManager.KeyboardListener = keyboardListener;
       CM.Gates.each(function(gate) {
-        var li = new Element('li', {id: 'gate'+gate.name, text: gate.name, class: 'gate'});
-        li.addEventListener('click', function(e) {alert(gate.name);});
+        var li = new Element('li', {id: 'gate'+gate.prototype.name, text: gate.prototype.name, class: 'gate'});
+        li.addEventListener('click', function(e) {alert(gate.prototype.name);});
         $('gateList').adopt(li);
       });
     }
