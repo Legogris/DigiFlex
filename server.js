@@ -44,17 +44,7 @@ console.log("Express server listening on port %d in %s mode", app.address().port
 // then just pass the server app handle to .listen()!
 var clients = {};
 
-var fs = require('fs');
-/*var server = require('http').createServer(function(req, response){
-  fs.readFile('index.html', function(err, data){
-    response.writeHead(200, {'Content-Type':'text/html'});  
-    response.write(data);  
-    response.end();
-  });
-});
-server.listen(8080);*/
 var everyone = require('now').initialize(app);
-
 
 everyone.connected(function(){
   console.log("Joined: " + this.now.name);

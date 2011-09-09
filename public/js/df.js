@@ -39,6 +39,11 @@ CM.UIManager = function() {
         active: true
       });
       CM.UIManager.KeyboardListener = keyboardListener;
+      CM.Gates.each(function(gate) {
+        var li = new Element('li', {id: 'gate'+gate.name, text: gate.name, class: 'gate'});
+        li.addEventListener('click', function(e) {alert(gate.name);});
+        $('gateList').adopt(li);
+      });
     }
   };
 }();
