@@ -30,13 +30,15 @@ var CM = function() {
             var val = CM.State.Variables[key];
             if(CM.State.Values[val] !== undefined) {
               CM.State.Values[key] = CM.State.Values[val];
-            }
+            } 
           }
         }
       }
       var stillGates = true;
+      var emptyRuns = 0;
       while(stillGates) {
         stillGates = false;
+        emptyRuns++;
         for(var id in CM.State.Gates) {
           if(CM.State.Values[id] === undefined) {
             stillGates = true;
@@ -44,15 +46,20 @@ var CM = function() {
             var allDefined = true;
             for(var i = 0; i < gate.inputCount; i++) {
               var val = gate.inElements[i].value;
-              if(CM.State.Values[val] === undefined) {
-                allDefined = false;
-              }
               gate.inValues[i] = CM.State.Values[val];
+              if(CM.State.Values[val] === undefined) {
+                if (emptyRuns > 2){
+                  gate.inValues[i] = 0;
+                } else {
+                  allDefined = false;
+                }
+              }
             }
             if(allDefined) {
               var result = gate.execute();
               CM.State.Values[gate.id] = result;
               $('output'+gate.id).setStyle('background-color', result ? 'red' : 'blue');
+              emptyRuns = 0;
             }
           }
         }
