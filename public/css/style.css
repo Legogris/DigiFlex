@@ -33,6 +33,9 @@ span.output {
 	background-color: #ccc;
 	width: 20px;
 }
+span.nOutput {
+  right: -31px;
+}
 #dfArea {
 	background-color: #fff;
 	width: 800px;
@@ -41,4 +44,9 @@ span.output {
 }
 #controlPanel {
 	float: left;
+}
+.negator {
+  position: absolute;
+  right: -10px;
+  top: 16px;
 }

@@ -23,7 +23,7 @@ CM.Gate = new Class({
 		self.id = id;
 	},
 	generateElement: function(withHooks) {
-    var e = new Element('div', {id: 'gt'+this.name, class: 'gate', text: this.symbol});
+    var e = new Element('div', {id: 'gt'+this.name, class: 'gate', html: this.symbol});
 		if(withHooks) {
 			for(var i = 0; i < this.inputCount; i++) {
 				var r = new Element('select', {class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
@@ -38,6 +38,11 @@ CM.Gate = new Class({
 				e.adopt(r);
 			}
 			var r = new Element('span', {id: 'output'+this.id, class: 'output', text: this.id});
+			if(this.reverses) {
+			  var s = new Element('span', {text: 'o', class: 'negator'});
+			  e.adopt(s);
+			  r.addClass('nOutput');
+			}
 			e.adopt(r)
 		}
 		return e;
@@ -82,7 +87,7 @@ CM.Invertor = new Class({
 
 CM.AND = new Class({
     Implements: [CM.Gate],
-    name: 'AND',
+    name: '2-ing AND',
     type: 3,
     inputCount: 2,
     reverses: false,
@@ -95,15 +100,47 @@ CM.AND = new Class({
 
 CM.OR = new Class({
     Implements: [CM.Gate],
-    name: 'OR',
+    name: '2-ing OR',
     type: 4,
     inputCount: 2,
     reverses: false,
-    symbol: '>= 1',
+    symbol: '&ge; 1',
 		lineColor: '#2ee',
     execute: function() {
         return this.inValues[0] || this.inValues[1];
     }
 });
 
-CM.GateTypes = [CM.XOR, CM.Invertor, CM.AND, CM.OR];
+CM.NAND = new Class({
+    Implements: [CM.AND],
+    name: '2-ing NAND',
+    type: 5,
+    reverses: true,
+		lineColor: '#22e',
+    execute: function() {
+        return !(this.inValues[0] && this.inValues[1]);
+    }
+});
+
+CM.NAND3 = new Class({
+    Implements: [CM.AND],
+    name: '3-ing NAND',
+    type: 6,
+    inputCount: 3,
+    reverses: true,
+		lineColor: '#22e',
+    execute: function() {
+        return !(this.inValues[0] && this.inValues[1] && this.inValues[2]);
+    }
+});
+
+CM.NOR = new Class({
+    Implements: [CM.OR],
+    name: '2-ing NOR',
+    type: 7,
+    reverses: true,
+    execute: function() {
+        return !(this.inValues[0] || this.inValues[1]);
+    }
+});
+CM.GateTypes = [CM.XOR, CM.Invertor, CM.AND, CM.OR, CM.NAND, CM.NAND3, CM.NOR];
