@@ -12,12 +12,52 @@ var CM = function() {
     State: {
       Variables: {},
 			Gates: {},
-			GateCount: 0
+			GateCount: 0,
+			Values: { '0': 0, '1': 1 }
     },
     DebugA: null,
     DebugB: null,
 
-    Init: Init
+    Init: Init,
+    Execute: function() {
+      CM.State.Values =  { '0': 0, '1': 1 };
+      var stillVars = true;
+      while(stillVars) {
+        stillVars = false;
+        for(var key in CM.State.Variables) {
+          if(CM.State.Values[key] === undefined) {
+            stillVars = true;
+            var val = CM.State.Variables[key];
+            if(CM.State.Values[val] !== undefined) {
+              CM.State.Values[key] = CM.State.Values[val];
+            }
+          }
+        }
+      }
+      var stillGates = true;
+      while(stillGates) {
+        stillGates = false;
+        for(var id in CM.State.Gates) {
+          if(CM.State.Values[id] === undefined) {
+            stillGates = true;
+            var gate = CM.State.Gates[id];
+            var allDefined = true;
+            for(var i = 0; i < gate.inputCount; i++) {
+              var val = gate.inElements[i].value;
+              if(CM.State.Values[val] === undefined) {
+                allDefined = false;
+              }
+              gate.inValues[i] = CM.State.Values[val];
+            }
+            if(allDefined) {
+              var result = gate.execute();
+              CM.State.Values[gate.id] = result;
+              $('output'+gate.id).setStyle('background-color', result ? 'red' : 'blue');
+            }
+          }
+        }
+      }
+    }
   };
 } ();
 
@@ -48,18 +88,27 @@ CM.UIManager = function() {
 				var row = new Element('tr').inject($('varTable'));
 				var nameCell = new Element('td');
 				var valueCell = new Element('td');
-				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', hint: 'variabelnamn'});
+				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn'});
 				nameBox.index = i;
 				nameBox.oldName = '';
 				nameBox.addEvent('change', function(e) {
 				  CM.State.Variables[this.value] = $('varSel'+this.index).value;
+				  delete CM.State.Variables[this.oldName];
 				  CM.UIManager.RenameVariable(this.oldName, this.value);
 				  this.oldName = this.value;
 				});
+				var valueSelect = new Element('select', {id: 'varSel' + i}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
+        valueSelect.index = i;
+        valueSelect.addEvent('change', function(e) {
+          CM.State.Variables[$('varTB' + this.index).value] = this.value;
+        });
 				nameCell.adopt(nameBox);
-				new Element('select', {id: 'varSel' + i}).inject(valueCell);
+				valueCell.adopt(valueSelect);
 				row.adopt([nameCell, valueCell]);
 			}
+			$('executeButton').addEvent('click', function(e) {
+			  CM.Execute();
+			});
       CM.GateTypes.each(function(gt) {
         var li = new Element('li', {text: gt.prototype.name, class: 'gate'});
 				var e = gt.prototype.generateElement(false);
@@ -133,16 +182,18 @@ CM.UIManager = function() {
   					var o = new Element('option', {text: g.id, value: g.id}); //Add other gates output to new gates input
   					el.adopt(o);
   				});
-  			}
+				}
+				g.inElements.each(function(el) {
+					var o = new Element('option', {text: gate.id, value: gate.id}); //Add new gate as input for every gate
+					el.adopt(o);  				  
+				});
 			}
-			CM.UIManager.RenameVariable('', gate.id);
 			for(var key in CM.State.Variables) {
 				gate.inElements.each(function(el) {
-					var o = new Element('option', {text: key, value: key}); //Add other gates output to new gates input
+					var o = new Element('option', {text: key, value: key}); //Add variables to new gates input
 					el.adopt(o);
 				});
 			}
-			
 		}
   };
 }();

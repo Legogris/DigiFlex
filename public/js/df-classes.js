@@ -26,7 +26,7 @@ CM.Gate = new Class({
     var e = new Element('div', {id: 'gt'+this.name, class: 'gate', text: this.symbol});
 		if(withHooks) {
 			for(var i = 0; i < this.inputCount; i++) {
-				var r = new Element('select', {class: 'input'});
+				var r = new Element('select', {class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
 				if(this.inputCount == 1) {
 					r.setStyle('top', '16px');
 				} else {
@@ -37,7 +37,7 @@ CM.Gate = new Class({
 				this.inElements.push(r);
 				e.adopt(r);
 			}
-			var r = new Element('span', {class: 'output', text: this.id});
+			var r = new Element('span', {id: 'output'+this.id, class: 'output', text: this.id});
 			e.adopt(r)
 		}
 		return e;
@@ -63,8 +63,8 @@ CM.XOR = new Class({
     reverses: false,
     symbol: '= 1',
 		lineColor: '#e2e',
-    execute: function(x, y) {
-        return x ^ y;
+    execute: function() {
+        return this.inValues[0] ^ this.inValues[1];
     }
 });
 
@@ -75,8 +75,8 @@ CM.Invertor = new Class({
     inputCount: 1,
     reverses: true,
     symbol: '1',
-    execute: function(x) {
-        return !x;
+    execute: function() {
+        return !this.inValues[0];
     }
 });
 
@@ -88,8 +88,8 @@ CM.AND = new Class({
     reverses: false,
     symbol: '&',
 		lineColor: '#22e',
-    execute: function(x, y) {
-        return x && y;
+    execute: function() {
+        return this.inValues[0] && this.inValues[1];
     }
 });
 
@@ -101,8 +101,8 @@ CM.OR = new Class({
     reverses: false,
     symbol: '>= 1',
 		lineColor: '#2ee',
-    execute: function(x, y) {
-        return x || y;
+    execute: function() {
+        return this.inValues[0] || this.inValues[1];
     }
 });
 
