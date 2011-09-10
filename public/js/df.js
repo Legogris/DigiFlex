@@ -10,6 +10,7 @@ var CM = function() {
     Strings: {},
     KeyboardListener: {},
     State: {
+      Variables: {},
 			Gates: {},
 			GateCount: 0
     },
@@ -43,6 +44,22 @@ CM.UIManager = function() {
       });
 			CM.UIManager.Context = $('dfCanvas').getContext('2d');
       CM.UIManager.KeyboardListener = keyboardListener;
+			for(var i = 0; i < CM.Settings.VariableCount; i++) {
+				var row = new Element('tr').inject($('varTable'));
+				var nameCell = new Element('td');
+				var valueCell = new Element('td');
+				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', hint: 'variabelnamn'});
+				nameBox.index = i;
+				nameBox.oldName = '';
+				nameBox.addEvent('change', function(e) {
+				  CM.State.Variables[this.value] = $('varSel'+this.index).value;
+				  CM.UIManager.RenameVariable(this.oldName, this.value);
+				  this.oldName = this.value;
+				});
+				nameCell.adopt(nameBox);
+				new Element('select', {id: 'varSel' + i}).inject(valueCell);
+				row.adopt([nameCell, valueCell]);
+			}
       CM.GateTypes.each(function(gt) {
         var li = new Element('li', {text: gt.prototype.name, class: 'gate'});
 				var e = gt.prototype.generateElement(false);
@@ -88,21 +105,44 @@ CM.UIManager = function() {
 				});
 			}
 		},
+		RenameVariable: function(oldName, newName) {
+		  $$('select').each(function(select) {
+		    if(typeof oldName !== undefined && oldName != '') {
+  		    var options = select.getElements('option');
+  		    for(var i in options) {
+  		      var o = options[i];
+  		      if(o.value == oldName) {
+  		        if(newName == '') {
+  		          o.dispose();
+  		        }
+  		        o.value = o.text = newName;
+  		        return;
+  		      }
+  		    }
+  	    }
+		    //If we get here, there is no existing option with the old name, so make a new one!
+		    select.adopt(new Element('option', {text: newName}));
+		  });
+		},
 		PlaceGate: function(gate) {
 			$('dfArea').adopt(gate.element);
 			for(var id in CM.State.Gates) {
 				var g = CM.State.Gates[id];
+				if(g !== gate) {
+  				gate.inElements.each(function(el) {
+  					var o = new Element('option', {text: g.id, value: g.id}); //Add other gates output to new gates input
+  					el.adopt(o);
+  				});
+  			}
+			}
+			CM.UIManager.RenameVariable('', gate.id);
+			for(var key in CM.State.Variables) {
 				gate.inElements.each(function(el) {
-					var o = new Element('option', {text: g.id}); //Add other gates output to new gates input
+					var o = new Element('option', {text: key, value: key}); //Add other gates output to new gates input
 					el.adopt(o);
 				});
-				if(g != gate) {
-					g.inElements.each(function(el) {
-						var o = new Element('option', {text: gate.id}); //Add new gates output to other gates input
-						el.adopt(o);
-					});
-				}
 			}
+			
 		}
   };
 }();
