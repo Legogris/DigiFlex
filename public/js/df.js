@@ -78,6 +78,18 @@ CM.UIManager = function() {
   var handleFileSelect = function(e) {
     var file = e.target.files[0];
     var reader = new FileReader();
+    
+    //Tabula rasa
+    for(var id in CM.State.Gates) {
+      var gate = CM.State.Gates[id];
+      gate.element.dispose();
+    }
+    CM.State.GateCount = 0;
+    CM.State.Gates = {};
+    CM.State.Variables = {};
+    CM.State.Values = {'0': 0, '1': 1};
+    CM.UIManager.InitVariableElements();
+    
     reader.onload = function(e) {
       var result = e.target.result.split('\r\n>');
       // Input variables
@@ -125,12 +137,8 @@ CM.UIManager = function() {
 
   return {
 		Context: undefined,
-    InitUI: function() {
-      var keyboardListener = new Keyboard({
-        active: true
-      });
-			CM.UIManager.Context = $('dfCanvas').getContext('2d');
-      CM.UIManager.KeyboardListener = keyboardListener;
+		InitVariableElements: function() {
+		  $('varTable').empty();
 			for(var i = 0; i < CM.Settings.VariableCount; i++) {
 				var row = new Element('tr').inject($('varTable'));
 				var nameCell = new Element('td');
@@ -153,6 +161,14 @@ CM.UIManager = function() {
 				valueCell.adopt(valueSelect);
 				row.adopt([nameCell, valueCell]);
 			}
+		},
+    InitUI: function() {
+      var keyboardListener = new Keyboard({
+        active: true
+      });
+			CM.UIManager.Context = $('dfCanvas').getContext('2d');
+      CM.UIManager.KeyboardListener = keyboardListener;
+      CM.UIManager.InitVariableElements();
 			$('executeButton').addEvent('click', function(e) {
 			  CM.Execute();
 			});
@@ -160,6 +176,7 @@ CM.UIManager = function() {
         var li = new Element('li', {text: gt.prototype.name, class: 'gate'});
 				var e = gt.prototype.generateElement(false);
 				li.adopt(e);
+				li.setStyle('height', 35+gt.prototype.height+'px');
         $('gateList').adopt(li);
 				var drag = new Drag.Move(e, {
 					snap: 0,
