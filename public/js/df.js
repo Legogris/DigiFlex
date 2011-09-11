@@ -105,7 +105,7 @@ CM.UIManager = function() {
         i++;
       }
 
-      //Place gates
+      //Initialize
       var matches = [];
       for(var i = 1; i < result.length; i++) {
         var match = gateRegex.exec(result[i]);
@@ -116,10 +116,10 @@ CM.UIManager = function() {
   				CM.State.Gates[gate.id] = gate;
         }
       }
-      //Second loop to assign in variables to each gate
+      //Second loop to place and assign in variables to each gate
       matches.each(function(match, i) {
         var gate = CM.State.Gates['u'+match[1]];
-        gate.place(parseInt(match[3])-200, parseInt(match[4]));
+        gate.place({x: parseInt(match[3])-200, y: parseInt(match[4])});
         var j = 0;
         var inMatch = inputRegex.exec(match[5]);
         while(inMatch) {
@@ -166,6 +166,7 @@ CM.UIManager = function() {
       var keyboardListener = new Keyboard({
         active: true
       });
+      $$('a.returnFalse').addEvent('click', function(e) { return false; });
       $('menuFileOpen').addEvent('click', function(e) {$('file').click();});
 			paper.setup($('dfCanvas'));
 			CM.UIManager.Context = $('dfCanvas').getContext('2d');
@@ -175,6 +176,7 @@ CM.UIManager = function() {
 			  CM.Execute();
 			});
       CM.GateTypes.each(function(gt) {
+        //Add dragndrop gates to the view
         var li = new Element('li', {text: gt.prototype.name, class: 'gate'});
 				var e = gt.prototype.generateElement(false);
 				li.adopt(e);
@@ -189,18 +191,31 @@ CM.UIManager = function() {
 							var gate = new gt('u' + CM.State.GateCount);
 							CM.State.GateCount++;
 							CM.State.Gates[gate.id] = gate;
-							gate.place(el.getLeft(), el.getTop());
+							gate.place(el.getPosition($('dfArea')));
 							CM.UIManager.DrawLines();
 						}
 						el.removeClass('dragging');
-						el.setStyles({left: el.originalX, top: el.originalY});
+						el.setPosition(el.originalPosition);
 					},
 					onSnap: function(el) {
-						el.addClass('dragging');
-						el.originalX = el.getStyle('left');
-						el.originalY = el.getStyle('top');
+					  if(!e.hasClass('dragging')) {
+						  el.addClass('dragging');
+						  el.originalPosition = el.getPosition();
+						}
 					},
 				});
+				//Add items to the menu
+        var li = new Element('li');
+        var a = new Element('a', {href: '#', text: gt.prototype.name});
+        a.addEvent('click', function(event) {
+          e.originalPosition = e.getPosition();
+          e.setPosition({x: event.client.x - e.getCoordinates().width/2, y: event.client.y - e.getCoordinates().height/2});
+          e.addClass('dragging');
+          e.fireEvent('mousedown', event);
+          return false;
+        });
+        li.adopt(a);
+        $('gateMenuList').adopt(li);
       });
       $('file').addEvent('change', handleFileSelect);
     },

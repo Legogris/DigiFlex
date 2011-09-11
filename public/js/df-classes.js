@@ -61,9 +61,9 @@ CM.Gate = new Class({
 		}
 		return e;
 	},
-	place: function(x, y) {
+	place: function(pos) {
 		this.element = this.generateElement(true);
-		this.element.setStyles({left: x, top: y});
+		this.element.setPosition(pos);
 		var drag = new Drag.Move(this.element, {
 			container: $('dfArea'),
 			onDrop: function() {
