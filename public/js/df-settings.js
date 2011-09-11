@@ -4,7 +4,7 @@ CM.Settings = {
 	BackgroundColor: '#000',
 	ViewWidth: 800,
 	ViewHeight: 600,
-	VariableCount: 1
+	VariableCount: 4
 };
 
 
