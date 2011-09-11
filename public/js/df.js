@@ -77,46 +77,50 @@ CM.NetMan = function() {
 CM.UIManager = function() {
   var handleFileSelect = function(e) {
     var file = e.target.files[0];
-    var result = file.getAsText('utf-8').split('\r\n>');
-    // Input variables
-    var ivRegex = /iv\[\d\]([a-zA-Z0-9]+)/g;
-    var gateRegex = /NUM:(\d+),TYPE:(\d),X=(\d+),Y=(\d+)\s+((?:IV\[\d{1,2}\][^s]+?\r\n)+)/
-    var inputRegex = /IV\[\d{1,2}\]([^s]+?)\r\n/g
-    var i = 0;
-    var match = ivRegex.exec(result[0]);
-    while(match) {
-      $('varTB' + i).value = match[1];
-      $('varTB' + i).fireEvent('change');
-      match = ivRegex.exec(result[0]);
-      i++;
-    }
-    
-    //Place gates
-    var matches = [];
-    for(var i = 1; i < result.length; i++) {
-      var match = gateRegex.exec(result[i]);
-      if(match) {
-        matches.push(match);
-        var gate = new CM.GateTypes[parseInt(match[2])-1]('u'+match[1]);
-        CM.State.GateCount++;
-				CM.State.Gates[gate.id] = gate;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var result = e.target.result.split('\r\n>');
+      // Input variables
+      var ivRegex = /iv\[\d\]([a-zA-Z0-9]+)/g;
+      var gateRegex = /NUM:(\d+),TYPE:(\d),X=(\d+),Y=(\d+)\s+((?:IV\[\d{1,2}\][^s]+?\r\n)+)/
+      var inputRegex = /IV\[\d{1,2}\]([^s]+?)\r\n/g
+      var i = 0;
+      var match = ivRegex.exec(result[0]);
+      while(match) {
+        $('varTB' + i).value = match[1];
+        $('varTB' + i).fireEvent('change');
+        match = ivRegex.exec(result[0]);
+        i++;
       }
-    }
-    //Second loop to assign in variables to each gate
-    matches.each(function(match, i) {
-      var gate = CM.State.Gates['u'+match[1]];
-      gate.place(parseInt(match[3])-200, parseInt(match[4]));
-      var j = 0;
-      var inMatch = inputRegex.exec(match[5]);
-      while(inMatch) {
-        var ie = gate.inElements[j];
-        var val = inMatch[1];
-        ie.set('value', val);
-        inMatch = inputRegex.exec(match[5]);
-        j++;
+
+      //Place gates
+      var matches = [];
+      for(var i = 1; i < result.length; i++) {
+        var match = gateRegex.exec(result[i]);
+        if(match) {
+          matches.push(match);
+          var gate = new CM.GateTypes[parseInt(match[2])-1]('u'+match[1]);
+          CM.State.GateCount++;
+  				CM.State.Gates[gate.id] = gate;
+        }
       }
-    });
-		CM.UIManager.DrawLines();
+      //Second loop to assign in variables to each gate
+      matches.each(function(match, i) {
+        var gate = CM.State.Gates['u'+match[1]];
+        gate.place(parseInt(match[3])-200, parseInt(match[4]));
+        var j = 0;
+        var inMatch = inputRegex.exec(match[5]);
+        while(inMatch) {
+          var ie = gate.inElements[j];
+          var val = inMatch[1];
+          ie.set('value', val);
+          inMatch = inputRegex.exec(match[5]);
+          j++;
+        }
+      });
+  		CM.UIManager.DrawLines();
+    };
+    reader.readAsText(file, 'utf-8');
   };
 
   return {
