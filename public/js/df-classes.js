@@ -4,6 +4,8 @@ CM.Gate = new Class({
 	symbol: '',
 	reverses: false,
 	inputCount: 1,
+	width: 30,
+	height: 30,
 	x: 0,
 	y: 0,
 	id: undefined,
@@ -24,13 +26,17 @@ CM.Gate = new Class({
 	},
 	generateElement: function(withHooks) {
     var e = new Element('div', {id: 'gt'+this.name, class: 'gate', html: this.symbol});
+    e.setStyles({
+      width: this.width+'px',
+      height: this.height+'px'
+    });
 		if(withHooks) {
 			for(var i = 0; i < this.inputCount; i++) {
 				var r = new Element('select', {class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
 				if(this.inputCount == 1) {
-					r.setStyle('top', '16px');
+					r.setStyle('top', (this.height)/2+'px');
 				} else {
-					r.setStyle('top', (50/this.inputCount)*i+'px');
+					r.setStyle('top', ((this.height+10)/this.inputCount)*i+'px'); //+oofsett to compensate for padding
 				}
 				r.addEvent('mousedown', function(e) {e.stopPropagation();});
 				r.addEvent('change', function() {CM.UIManager.DrawLines();});
@@ -38,8 +44,14 @@ CM.Gate = new Class({
 				e.adopt(r);
 			}
 			var r = new Element('span', {id: 'output'+this.id, class: 'output', text: this.id});
+			r.setStyles({
+			  top: (this.height/2-5)+'px'
+			});
 			if(this.reverses) {
 			  var s = new Element('span', {text: 'o', class: 'negator'});
+  			s.setStyles({
+  			  top: (this.height/2-5)+'px'
+  			});
 			  e.adopt(s);
 			  r.addClass('nOutput');
 			}
@@ -60,23 +72,11 @@ CM.Gate = new Class({
 	}
 });
 
-CM.XOR = new Class({
-    Implements: [CM.Gate],
-    name: 'XOR',
-    type: 1,
-    inputCount: 2,
-    reverses: false,
-    symbol: '= 1',
-		lineColor: '#e2e',
-    execute: function() {
-        return this.inValues[0] ^ this.inValues[1];
-    }
-});
-
 CM.Invertor = new Class({
     Implements: [CM.Gate],
     name: 'Inverterare',
-    type: 2,
+    type: 1,
+    height: 20,
     inputCount: 1,
     reverses: true,
     symbol: '1',
@@ -98,10 +98,21 @@ CM.AND = new Class({
     }
 });
 
+CM.NAND = new Class({
+    Implements: [CM.AND],
+    name: '2-ing NAND',
+    type: 2,
+    reverses: true,
+		lineColor: '#22e',
+    execute: function() {
+        return !(this.inValues[0] && this.inValues[1]);
+    }
+});
+
 CM.OR = new Class({
     Implements: [CM.Gate],
     name: '2-ing OR',
-    type: 4,
+    type: 7,
     inputCount: 2,
     reverses: false,
     symbol: '&ge; 1',
@@ -111,21 +122,21 @@ CM.OR = new Class({
     }
 });
 
-CM.NAND = new Class({
-    Implements: [CM.AND],
-    name: '2-ing NAND',
-    type: 5,
+CM.NOR = new Class({
+    Implements: [CM.OR],
+    name: '2-ing NOR',
+    type: 4,
     reverses: true,
-		lineColor: '#22e',
     execute: function() {
-        return !(this.inValues[0] && this.inValues[1]);
+        return !(this.inValues[0] || this.inValues[1]);
     }
 });
 
 CM.NAND3 = new Class({
     Implements: [CM.AND],
     name: '3-ing NAND',
-    type: 6,
+    type: 5,
+    height: 60,
     inputCount: 3,
     reverses: true,
 		lineColor: '#22e',
@@ -134,13 +145,17 @@ CM.NAND3 = new Class({
     }
 });
 
-CM.NOR = new Class({
-    Implements: [CM.OR],
-    name: '2-ing NOR',
-    type: 7,
-    reverses: true,
+CM.XOR = new Class({
+    Implements: [CM.Gate],
+    name: 'XOR',
+    type: 6,
+    inputCount: 2,
+    reverses: false,
+    symbol: '= 1',
+		lineColor: '#e2e',
     execute: function() {
-        return !(this.inValues[0] || this.inValues[1]);
+        return this.inValues[0] ^ this.inValues[1];
     }
 });
-CM.GateTypes = [CM.XOR, CM.Invertor, CM.AND, CM.OR, CM.NAND, CM.NAND3, CM.NOR];
+
+CM.GateTypes = [CM.Invertor, CM.AND, CM.NAND, CM.NOR, CM.NAND3, CM.XOR, CM.OR];

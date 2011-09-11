@@ -75,12 +75,48 @@ CM.NetMan = function() {
 }();
 
 CM.UIManager = function() {
-  var loadAsset = function(url, onLoaded) {
-    if(!Crafty.assets[url]) {
-      Crafty.load([url], onLoaded);
-    } else {
-      onLoaded();
+  var handleFileSelect = function(e) {
+    var file = e.target.files[0];
+    var result = file.getAsText('utf-8').split('\r\n>');
+    // Input variables
+    var ivRegex = /iv\[\d\]([a-zA-Z0-9]+)/g;
+    var gateRegex = /NUM:(\d+),TYPE:(\d),X=(\d+),Y=(\d+)\s+((?:IV\[\d{1,2}\][^s]+?\r\n)+)/
+    var inputRegex = /IV\[\d{1,2}\]([^s]+?)\r\n/g
+    var i = 0;
+    var match = ivRegex.exec(result[0]);
+    while(match) {
+      $('varTB' + i).value = match[1];
+      $('varTB' + i).fireEvent('change');
+      match = ivRegex.exec(result[0]);
+      i++;
     }
+    
+    //Place gates
+    var matches = [];
+    for(var i = 1; i < result.length; i++) {
+      var match = gateRegex.exec(result[i]);
+      if(match) {
+        matches.push(match);
+        var gate = new CM.GateTypes[parseInt(match[2])-1]('u'+match[1]);
+        CM.State.GateCount++;
+				CM.State.Gates[gate.id] = gate;
+      }
+    }
+    //Second loop to assign in variables to each gate
+    matches.each(function(match, i) {
+      var gate = CM.State.Gates['u'+match[1]];
+      gate.place(parseInt(match[3])-200, parseInt(match[4]));
+      var j = 0;
+      var inMatch = inputRegex.exec(match[5]);
+      while(inMatch) {
+        var ie = gate.inElements[j];
+        var val = inMatch[1];
+        ie.set('value', val);
+        inMatch = inputRegex.exec(match[5]);
+        j++;
+      }
+    });
+		CM.UIManager.DrawLines();
   };
 
   return {
@@ -143,6 +179,7 @@ CM.UIManager = function() {
 					},
 				});
       });
+      $('file').addEvent('change', handleFileSelect);
     },
 		DrawLines: function() {
 			CM.UIManager.Context.beginPath();
@@ -153,8 +190,8 @@ CM.UIManager = function() {
 					if(input.value[0] == 'u' && input.value != id) {
 						var tg = CM.State.Gates[input.value]; //Target gate
 						CM.UIManager.Context.beginPath();
-						CM.UIManager.Context.moveTo(input.getLeft(), input.getTop());
-						CM.UIManager.Context.lineTo(tg.element.getLeft()+60, tg.element.getTop()+30);
+						CM.UIManager.Context.moveTo(input.getLeft(), input.getTop()+5);
+						CM.UIManager.Context.lineTo(tg.element.getLeft()+tg.width, tg.element.getTop()+tg.height/2);
 						CM.UIManager.Context.strokeStyle = tg.lineColor;
 						CM.UIManager.Context.stroke();
 					}
@@ -191,6 +228,11 @@ CM.UIManager = function() {
   				});
 				}
 				g.inElements.each(function(el) {
+				  for(var i = 0; i < el.options.length; i++) {
+				    if(el.options[i].value == gate.id) {
+				      return; //Do not add if gate already added (for file load when severla gates are initialized at the same time)
+				    }
+				  }
 					var o = new Element('option', {text: gate.id, value: gate.id}); //Add new gate as input for every gate
 					el.adopt(o);  				  
 				});

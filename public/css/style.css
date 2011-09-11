@@ -13,7 +13,7 @@ div.gate {
   border: 1px dashed #222;
   background-color: #eee;
 	position: absolute;
-	padding: 10px;
+	padding: 5px;
 	cursor: move;
 }
 
@@ -22,14 +22,14 @@ div.gate {
 }
 select.input {
 	position: absolute;
-	left: -60px;
-	width: 60px;
+	left: -40px;
+	width: 40px;
 }
 
 span.output {
 	position: absolute;
 	right: -21px;
-	top: 16px;
+	top: 10px;
 	background-color: #ccc;
 	width: 20px;
 }
@@ -48,5 +48,5 @@ span.nOutput {
 .negator {
   position: absolute;
   right: -10px;
-  top: 16px;
+  top: 10px;
 }
