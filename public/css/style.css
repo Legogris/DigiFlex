@@ -22,8 +22,8 @@ div.gate {
 }
 select.input {
 	position: absolute;
-	left: -40px;
-	width: 40px;
+	left: -50px;
+	width: 50px;
 }
 
 span.output {

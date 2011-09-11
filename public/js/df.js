@@ -187,7 +187,7 @@ CM.UIManager = function() {
 							var gate = new gt('u' + CM.State.GateCount);
 							CM.State.GateCount++;
 							CM.State.Gates[gate.id] = gate;
-							gate.place(e.client.x, e.client.y);
+							gate.place(el.getLeft(), el.getTop());
 							CM.UIManager.DrawLines();
 						}
 						el.removeClass('dragging');
@@ -212,7 +212,7 @@ CM.UIManager = function() {
 						var tg = CM.State.Gates[input.value]; //Target gate
 						CM.UIManager.Context.beginPath();
 						CM.UIManager.Context.moveTo(input.getLeft(), input.getTop()+5);
-						CM.UIManager.Context.lineTo(tg.element.getLeft()+tg.width, tg.element.getTop()+tg.height/2);
+						CM.UIManager.Context.lineTo(tg.element.getLeft()+tg.element.getWidth()+20, tg.element.getTop()+tg.element.getHeight()/2);
 						CM.UIManager.Context.strokeStyle = tg.lineColor;
 						CM.UIManager.Context.stroke();
 					}

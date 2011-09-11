@@ -30,6 +30,13 @@ CM.Gate = new Class({
       width: this.width+'px',
       height: this.height+'px'
     });
+    if(this.reverses) {
+		  var s = new Element('span', {text: 'o', class: 'negator'});
+			s.setStyles({
+			  top: (this.height/2-5)+'px'
+			});
+		  e.adopt(s);
+		}
 		if(withHooks) {
 			for(var i = 0; i < this.inputCount; i++) {
 				var r = new Element('select', {class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
@@ -48,11 +55,6 @@ CM.Gate = new Class({
 			  top: (this.height/2-5)+'px'
 			});
 			if(this.reverses) {
-			  var s = new Element('span', {text: 'o', class: 'negator'});
-  			s.setStyles({
-  			  top: (this.height/2-5)+'px'
-  			});
-			  e.adopt(s);
 			  r.addClass('nOutput');
 			}
 			e.adopt(r)
