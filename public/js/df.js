@@ -64,6 +64,7 @@ var CM = function() {
           }
         }
       }
+      CM.UIManager.DrawLines();
     }
   };
 } ();
@@ -75,11 +76,7 @@ CM.NetMan = function() {
 }();
 
 CM.UIManager = function() {
-  var handleFileSelect = function(e) {
-    var file = e.target.files[0];
-    var reader = new FileReader();
-    
-    //Tabula rasa
+  var clean = function() {
     for(var id in CM.State.Gates) {
       var gate = CM.State.Gates[id];
       gate.element.dispose();
@@ -89,7 +86,12 @@ CM.UIManager = function() {
     CM.State.Variables = {};
     CM.State.Values = {'0': 0, '1': 1};
     CM.UIManager.InitVariableElements();
-    
+  };
+  
+  var handleFileSelect = function(e) {
+    var file = e.target.files[0];
+    var reader = new FileReader();
+    clean();
     reader.onload = function(e) {
       var result = e.target.result.split('\r\n>');
       // Input variables
@@ -99,6 +101,9 @@ CM.UIManager = function() {
       var i = 0;
       var match = ivRegex.exec(result[0]);
       while(match) {
+        while(!$('varTB' + i)) {
+          CM.UIManager.AddVariable();
+        }
         $('varTB' + i).value = match[1];
         $('varTB' + i).fireEvent('change');
         match = ivRegex.exec(result[0]);
@@ -137,29 +142,35 @@ CM.UIManager = function() {
 
   return {
 		Context: undefined,
+		AddVariable: function(name) {
+		  name = typeof name === undefined ? '': name;
+		  var i = $$('.varRow').length;
+			var row = new Element('tr', {class: 'varRow'}).inject($('varTable'));
+			var nameCell = new Element('td');
+			var valueCell = new Element('td');
+			var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn', class: 'input'});
+			nameBox.index = i;
+			nameBox.oldName = '';
+			nameBox.addEvent('change', function(e) {
+			  CM.State.Variables[this.value] = $('varSel'+this.index).value;
+			  delete CM.State.Variables[this.oldName];
+			  CM.UIManager.RenameVariable(this.oldName, this.value);
+			  this.oldName = this.value;
+			});
+			var valueSelect = new Element('select', {id: 'varSel' + i, class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
+      valueSelect.index = i;
+      valueSelect.addEvent('change', function(e) {
+        CM.State.Variables[$('varTB' + this.index).value] = this.value;
+        CM.Execute();
+      });
+			nameCell.adopt(nameBox);
+			valueCell.adopt(valueSelect);
+			row.adopt([nameCell, valueCell]);
+		},
 		InitVariableElements: function() {
 		  $('varTable').empty();
 			for(var i = 0; i < CM.Settings.VariableCount; i++) {
-				var row = new Element('tr').inject($('varTable'));
-				var nameCell = new Element('td');
-				var valueCell = new Element('td');
-				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn', class: 'input'});
-				nameBox.index = i;
-				nameBox.oldName = '';
-				nameBox.addEvent('change', function(e) {
-				  CM.State.Variables[this.value] = $('varSel'+this.index).value;
-				  delete CM.State.Variables[this.oldName];
-				  CM.UIManager.RenameVariable(this.oldName, this.value);
-				  this.oldName = this.value;
-				});
-				var valueSelect = new Element('select', {id: 'varSel' + i, class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
-        valueSelect.index = i;
-        valueSelect.addEvent('change', function(e) {
-          CM.State.Variables[$('varTB' + this.index).value] = this.value;
-        });
-				nameCell.adopt(nameBox);
-				valueCell.adopt(valueSelect);
-				row.adopt([nameCell, valueCell]);
+			  CM.UIManager.AddVariable();
 			}
 		},
     InitUI: function() {
@@ -167,7 +178,9 @@ CM.UIManager = function() {
         active: true
       });
       $$('a.returnFalse').addEvent('click', function(e) { return false; });
+      $('menuFileNew').addEvent('click', function(e) { clean(); return false; });
       $('menuFileOpen').addEvent('click', function(e) {$('file').click();});
+      $('newVarButton').addEvent('click', function(e) {CM.UIManager.AddVariable(); });
 			paper.setup($('dfCanvas'));
 			CM.UIManager.Context = $('dfCanvas').getContext('2d');
       CM.UIManager.KeyboardListener = keyboardListener;
@@ -233,7 +246,7 @@ CM.UIManager = function() {
             var path = new paper.Path();  
             var start = new paper.Point(startCords.left, startCords.top+startCords.height/2);
             var end = new paper.Point(endCords.left+endCords.width+20, endCords.top+endCords.height/2);
-            path.strokeColor = tg.lineColor;
+            path.strokeColor = $('output'+tg.id).getStyle('background-color');
             path.moveTo(start);
             path.lineTo(start.add([ -30, 0 ]));
             path.lineTo(end.add([30, 0]));

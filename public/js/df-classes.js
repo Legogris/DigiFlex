@@ -46,7 +46,7 @@ CM.Gate = new Class({
 					r.setStyle('top', ((this.height+10)/this.inputCount)*i+'px'); //+oofsett to compensate for padding
 				}
 				r.addEvent('mousedown', function(e) {e.stopPropagation();});
-				r.addEvent('change', function() {CM.UIManager.DrawLines();});
+				r.addEvent('change', function() {CM.Execute();});
 				this.inElements.push(r);
 				e.adopt(r);
 			}

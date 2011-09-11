@@ -57,3 +57,10 @@ position: absolute;
 top: 0;
 left: 0;
 }
+#newVarButton {
+  width: 16px;
+  height: 16px;
+  background-image: url('/images/plus-circle.png');
+  cursor: hand;
+  cursor: pointer;
+}
