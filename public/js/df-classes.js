@@ -39,9 +39,9 @@ CM.Gate = new Class({
 		}
 		if(withHooks) {
 			for(var i = 0; i < this.inputCount; i++) {
-				var r = new Element('select', {class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
+				var r = new Element('select', {class: 'input gateInput'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
 				if(this.inputCount == 1) {
-					r.setStyle('top', (this.height)/2+'px');
+					r.setStyle('top', (this.height)/2-5+'px');
 				} else {
 					r.setStyle('top', ((this.height+10)/this.inputCount)*i+'px'); //+oofsett to compensate for padding
 				}

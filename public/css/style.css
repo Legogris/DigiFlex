@@ -1,8 +1,6 @@
 html, body {
 	margin: 0;
 	padding: 0;
-	font-family: 'Courier New';
-	background-color: #ccc;
 }
 li.gate {
 	height: 70px;
@@ -15,12 +13,13 @@ div.gate {
 	position: absolute;
 	padding: 5px;
 	cursor: move;
+	color: #282828;
 }
 
 .gate div.dragging {
 	background-color: #ddd;
 }
-select.input {
+select.gateInput {
 	position: absolute;
 	left: -50px;
 	width: 50px;
@@ -41,6 +40,7 @@ span.nOutput {
 	width: 800px;
 	height: 600px;
 	float: left;
+	position: relative;
 }
 #controlPanel {
 	float: left;
@@ -49,4 +49,10 @@ span.nOutput {
   position: absolute;
   right: -10px;
   top: 10px;
+}
+#file {
+opacity: 0.2;
+z-index: -1;
+position: absolute;
+top: 0;
 }

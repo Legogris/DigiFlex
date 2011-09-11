@@ -143,7 +143,7 @@ CM.UIManager = function() {
 				var row = new Element('tr').inject($('varTable'));
 				var nameCell = new Element('td');
 				var valueCell = new Element('td');
-				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn'});
+				var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn', class: 'input'});
 				nameBox.index = i;
 				nameBox.oldName = '';
 				nameBox.addEvent('change', function(e) {
@@ -152,7 +152,7 @@ CM.UIManager = function() {
 				  CM.UIManager.RenameVariable(this.oldName, this.value);
 				  this.oldName = this.value;
 				});
-				var valueSelect = new Element('select', {id: 'varSel' + i}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
+				var valueSelect = new Element('select', {id: 'varSel' + i, class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
         valueSelect.index = i;
         valueSelect.addEvent('change', function(e) {
           CM.State.Variables[$('varTB' + this.index).value] = this.value;
@@ -166,6 +166,8 @@ CM.UIManager = function() {
       var keyboardListener = new Keyboard({
         active: true
       });
+      $('menuFileOpen').addEvent('click', function(e) {$('file').click();});
+			paper.setup($('dfCanvas'));
 			CM.UIManager.Context = $('dfCanvas').getContext('2d');
       CM.UIManager.KeyboardListener = keyboardListener;
       CM.UIManager.InitVariableElements();
@@ -205,18 +207,25 @@ CM.UIManager = function() {
 		DrawLines: function() {
 			CM.UIManager.Context.beginPath();
 			CM.UIManager.Context.clearRect(0, 0, CM.Settings.ViewWidth, CM.Settings.ViewHeight);
+			paper.project.activeLayer.removeChildren();
 			for(var id in CM.State.Gates) {
 				var gate = CM.State.Gates[id];
 				gate.inElements.each(function(input) {
 					if(input.value[0] == 'u' && input.value != id) {
 						var tg = CM.State.Gates[input.value]; //Target gate
-						CM.UIManager.Context.beginPath();
-						CM.UIManager.Context.moveTo(input.getLeft(), input.getTop()+5);
-						CM.UIManager.Context.lineTo(tg.element.getLeft()+tg.element.getWidth()+20, tg.element.getTop()+tg.element.getHeight()/2);
-						CM.UIManager.Context.strokeStyle = tg.lineColor;
-						CM.UIManager.Context.stroke();
+						var startCords = input.getCoordinates($('dfCanvas'));
+						var endCords = tg.element.getCoordinates($('dfCanvas'));
+            var path = new paper.Path();  
+            var start = new paper.Point(startCords.left, startCords.top+startCords.height/2);
+            var end = new paper.Point(endCords.left+endCords.width+20, endCords.top+endCords.height/2);
+            path.strokeColor = tg.lineColor;
+            path.moveTo(start);
+            path.lineTo(start.add([ -30, 0 ]));
+            path.lineTo(end.add([30, 0]));
+            path.lineTo(end);
 					}
 				});
+        paper.view.draw();
 			}
 		},
 		RenameVariable: function(oldName, newName) {
