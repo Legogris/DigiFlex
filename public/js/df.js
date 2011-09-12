@@ -65,6 +65,11 @@ var CM = function() {
         }
       }
       CM.UIManager.DrawLines();
+    },
+    SaveFile: function() {
+        var content = 'test';
+        var uriData = "data:application/octet-stream," + encodeURIComponent(content);
+        var win = window.open(uriData, 'fileWindow');
     }
   };
 } ();
@@ -179,6 +184,7 @@ CM.UIManager = function() {
       });
       $$('a.returnFalse').addEvent('click', function(e) { return false; });
       $('menuFileNew').addEvent('click', function(e) { clean(); return false; });
+      $('menuFileSave').addEvent('click', function(e) { CM.SaveFile(); });
       $('menuFileOpen').addEvent('click', function(e) {$('file').click();});
       $('newVarButton').addEvent('click', function(e) {CM.UIManager.AddVariable(); });
 			paper.setup($('dfCanvas'));
