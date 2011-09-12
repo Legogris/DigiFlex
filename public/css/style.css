@@ -1,10 +1,66 @@
+html, body {
+margin: 0;
+padding: 0;
+}
 li.gate {
-  cursor: hand;
-  cursor: pointer;
+height: 70px;
 }
 div.gate {
-  width: 100px;
-  height: 100px;
+  width: 30px;
+  height: 30px;
   border: 1px dashed #222;
-  background-color: #ddd;
+  background-color: #eee;
+position: absolute;
+padding: 5px;
+cursor: move;
+color: #282828;
+}
+
+.gate div.dragging {
+background-color: #ddd;
+}
+select.gateInput {
+position: absolute;
+left: -50px;
+width: 50px;
+}
+
+span.output {
+position: absolute;
+right: -21px;
+top: 10px;
+background-color: #ccc;
+width: 20px;
+}
+span.nOutput {
+  right: -31px;
+}
+#dfArea {
+background-color: #fff;
+width: 800px;
+height: 600px;
+float: left;
+position: relative;
+}
+#controlPanel {
+float: left;
+}
+.negator {
+  position: absolute;
+  right: -10px;
+  top: 10px;
+}
+#file {
+opacity: 0;
+z-index: -1;
+position: absolute;
+top: 0;
+left: 0;
+}
+#newVarButton {
+  width: 16px;
+  height: 16px;
+  background-image: url('/images/plus-circle.png');
+  cursor: hand;
+  cursor: pointer;
 }
