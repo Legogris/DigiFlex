@@ -68,15 +68,17 @@ var CM = function() {
     },
     SaveFile: function() {
         var data = '## DIGIFLEX - Kopplingsboxen, Version 1\r\n';
+        var i = 0;
         for(var v in CM.State.Variables) {
             data += '/iv['+i+']' + v + '\r\n';
+            i++;
         }
-        var i = 0;
+        i = 0;
         for(var key in CM.State.Gates) {
             var gate = CM.State.Gates[key];
             data += '>NUM:'+i+',TYPE:'+gate.type+',X='+gate.x+',Y='+gate.y+'\r\n';
             gate.inElements.each(function(e, i) {
-                data += 'IV['+i+']'+e+'\r\n';
+                data += 'IV['+i+']'+e.value+'\r\n';
             });
             data += '<\r\n';
             i++;
