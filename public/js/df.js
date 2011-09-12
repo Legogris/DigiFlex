@@ -248,7 +248,10 @@ CM.UIManager = function() {
             var end = new paper.Point(endCords.left+endCords.width+20, endCords.top+endCords.height/2);
             path.strokeColor = $('output'+tg.id).getStyle('background-color');
             path.moveTo(start);
-            path.lineTo(start.add([ -30, 0 ]));
+            var next = start.add([ -30, 0 ]);
+            path.lineTo(next);
+            next = start.add(0, startCords.top - endCords.top);
+            path.lineTo(next);
             path.lineTo(end.add([30, 0]));
             path.lineTo(end);
 					}
