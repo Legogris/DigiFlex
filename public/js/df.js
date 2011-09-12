@@ -70,7 +70,7 @@ var CM = function() {
         var data = '## DIGIFLEX - Kopplingsboxen, Version 1\r\n';
         for(v in CM.State.Variables) {
             data += '/iv['+i+']' + v + '\r\n';
-        });
+        }
         var i = 0;
         for(var key in CM.State.Gates) {
             var gate = CM.State.Gates[key];
