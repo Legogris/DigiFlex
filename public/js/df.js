@@ -68,7 +68,7 @@ var CM = function() {
     },
     SaveFile: function() {
         var data = '## DIGIFLEX - Kopplingsboxen, Version 1\r\n';
-        for(v in CM.State.Variables) {
+        for(var v in CM.State.Variables) {
             data += '/iv['+i+']' + v + '\r\n';
         }
         var i = 0;
@@ -82,7 +82,7 @@ var CM = function() {
             i++;
         }
         data += '##<\r\n';
-        var uriData = "data:application/octet-stream," + encodeURIComponent(content);
+        var uriData = "data:application/octet-stream," + encodeURIComponent(data);
         var win = window.open(uriData, 'fileWindow');
     }
   };
