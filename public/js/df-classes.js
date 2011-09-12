@@ -69,9 +69,9 @@ CM.Gate = new Class({
 			onDrop: function() {
 				CM.UIManager.DrawLines();
 			},
-            onDrag: function() {
-                CM.UIManager.DrawLines();
-            }
+      onDrag: function() {
+        CM.UIManager.DrawLines();
+      }
 		});
 		CM.UIManager.PlaceGate(this);
 	}
