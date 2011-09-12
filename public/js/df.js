@@ -215,10 +215,7 @@ CM.UIManager = function() {
 						  el.addClass('dragging');
 						  el.originalPosition = el.getPosition();
 						}
-					},
-                    onDrag: function() {
-                        CM.UIManager.DrawLines();
-                    }
+					}
 				});
 				//Add items to the menu
         var li = new Element('li');

@@ -68,7 +68,10 @@ CM.Gate = new Class({
 			container: $('dfArea'),
 			onDrop: function() {
 				CM.UIManager.DrawLines();
-			}
+			},
+            onDrag: function() {
+                CM.UIManager.DrawLines();
+            }
 		});
 		CM.UIManager.PlaceGate(this);
 	}
