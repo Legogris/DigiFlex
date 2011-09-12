@@ -68,7 +68,7 @@ var CM = function() {
     },
     SaveFile: function() {
         var data = '## DIGIFLEX - Kopplingsboxen, Version 1\r\n';
-        CM.State.Variables.each(function(v, i){
+        for(v in CM.State.Variables) {
             data += '/iv['+i+']' + v + '\r\n';
         });
         var i = 0;
