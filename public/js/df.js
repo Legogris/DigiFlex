@@ -76,7 +76,7 @@ var CM = function() {
         i = 0;
         for(var key in CM.State.Gates) {
             var gate = CM.State.Gates[key];
-            data += '>NUM:'+i+',TYPE:'+gate.type+',X='+gate.x+',Y='+gate.y+'\r\n';
+            data += '>NUM:'+i+',TYPE:'+gate.type+',X='+(gate.element.getLeft()+300)+',Y='+gate.element.getTop()+'\r\n';
             gate.inElements.each(function(e, i) {
                 data += 'IV['+i+']'+e.value+'\r\n';
             });
