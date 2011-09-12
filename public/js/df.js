@@ -250,7 +250,7 @@ CM.UIManager = function() {
             path.moveTo(start);
             var next = start.add([ -30, 0 ]);
             path.lineTo(next);
-            next = start.add(0, startCords.top - endCords.top);
+            next = start.add(0, startCords.top - endCords.top - 30);
             path.lineTo(next);
             path.lineTo(end.add([30, 0]));
             path.lineTo(end);
