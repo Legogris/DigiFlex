@@ -244,7 +244,7 @@ CM.UIManager = function() {
 					onSnap: function(el) {
 					  if(!e.hasClass('dragging')) {
 						  el.addClass('dragging');
-						  el.originalPosition = el.getPosition();
+						  el.originalPosition = el.getPosition($('gateList'));
 						}
 					}
 				});
@@ -270,7 +270,7 @@ CM.UIManager = function() {
 			for(var id in CM.State.Gates) {
 				var gate = CM.State.Gates[id];
 				gate.inElements.each(function(input) {
-					if(input.value[0] == 'u' && input.value != id) {
+					if(input.value[0] == 'u' && input.value != id && input.value != id + "'") {
 					  var tgID = input.value[input.value.length-1] == "'" ? input.value.slice(0, input.value.length-1) : input.value; //Also get ID for negated values, removing the '
 						var tg = CM.State.Gates[tgID]; //Target gate
 						var startCords = input.getCoordinates($('dfCanvas'));

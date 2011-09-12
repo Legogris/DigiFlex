@@ -64,3 +64,6 @@ left: 0;
   cursor: hand;
   cursor: pointer;
 }
+#gateList {
+  position: relative;
+}
