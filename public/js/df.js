@@ -67,7 +67,21 @@ var CM = function() {
       CM.UIManager.DrawLines();
     },
     SaveFile: function() {
-        var content = 'test';
+        var data = '## DIGIFLEX - Kopplingsboxen, Version 1\r\n';
+        CM.State.Variables.each(function(v, i){
+            data += '/iv['+i+']' + v + '\r\n';
+        });
+        var i = 0;
+        for(var key in CM.State.Gates) {
+            var gate = CM.State.Gates[key];
+            data += '>NUM:'+i+',TYPE:'+gate.type+',X='+gate.x+',Y='+gate.y+'\r\n';
+            gate.inElements.each(function(e, i) {
+                data += 'IV['+i+']'+e+'\r\n';
+            });
+            data += '<\r\n';
+            i++;
+        }
+        data += '##<\r\n';
         var uriData = "data:application/octet-stream," + encodeURIComponent(content);
         var win = window.open(uriData, 'fileWindow');
     }
