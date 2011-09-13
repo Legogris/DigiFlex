@@ -11,31 +11,39 @@ var CM = function() {
     KeyboardListener: {},
     State: {
       Variables: {},
-			Gates: {},
-			GateCount: 0,
-			Values: { '0': 0, '1': 1 }
+Gates: {},
+GateCount: 0,
+Values: { '0': 0, '1': 1 }
     },
     DebugA: null,
     DebugB: null,
 
     Init: Init,
     Execute: function() {
-      CM.State.Values =  { '0': 0, '1': 1 };
+      CM.State.Values = { '0': 0, '1': 1 };
       var stillVars = true;
+      var emptyRuns = 0;
       while(stillVars) {
         stillVars = false;
+        emptyRuns++;
         for(var key in CM.State.Variables) {
           if(CM.State.Values[key] === undefined) {
             stillVars = true;
             var val = CM.State.Variables[key];
             if(CM.State.Values[val] !== undefined) {
+              emptyRuns = 0;
               CM.State.Values[key] = CM.State.Values[val];
-            } 
+              CM.State.Values[key+"'"] = !CM.State.Values[val];
+            }
           }
+        }
+        if(emptyRuns > 3) {
+          alert('Rekursiv variabeldefiniering är inte svalt, broder.');
+          return;
         }
       }
       var stillGates = true;
-      var emptyRuns = 0;
+      emptyRuns = 0;
       while(stillGates) {
         stillGates = false;
         emptyRuns++;
@@ -58,6 +66,7 @@ var CM = function() {
             if(allDefined) {
               var result = gate.execute();
               CM.State.Values[gate.id] = result;
+              CM.State.Values[gate.id+"'"] = !result;
               $('output'+gate.id).setStyle('background-color', result ? 'red' : 'blue');
               emptyRuns = 0;
             }
@@ -139,7 +148,7 @@ CM.UIManager = function() {
           matches.push(match);
           var gate = new CM.GateTypes[parseInt(match[2])-1]('u'+match[1]);
           CM.State.GateCount++;
-  				CM.State.Gates[gate.id] = gate;
+   CM.State.Gates[gate.id] = gate;
         }
       }
       //Second loop to place and assign in variables to each gate
@@ -156,44 +165,44 @@ CM.UIManager = function() {
           j++;
         }
       });
-  		CM.UIManager.DrawLines();
+   CM.UIManager.DrawLines();
     };
     reader.readAsText(file, 'utf-8');
   };
 
   return {
-		Context: undefined,
-		AddVariable: function(name) {
-		  name = typeof name === undefined ? '': name;
-		  var i = $$('.varRow').length;
-			var row = new Element('tr', {class: 'varRow'}).inject($('varTable'));
-			var nameCell = new Element('td');
-			var valueCell = new Element('td');
-			var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn', class: 'input'});
-			nameBox.index = i;
-			nameBox.oldName = '';
-			nameBox.addEvent('change', function(e) {
-			  CM.State.Variables[this.value] = $('varSel'+this.index).value;
-			  delete CM.State.Variables[this.oldName];
-			  CM.UIManager.RenameVariable(this.oldName, this.value);
-			  this.oldName = this.value;
-			});
-			var valueSelect = new Element('select', {id: 'varSel' + i, class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
+Context: undefined,
+AddVariable: function(name) {
+name = typeof name === undefined ? '': name;
+var i = $$('.varRow').length;
+var row = new Element('tr', {class: 'varRow'}).inject($('varTable'));
+var nameCell = new Element('td');
+var valueCell = new Element('td');
+var nameBox = new Element('input', {id: 'varTB' + i, type: 'text', placeHolder: 'Variabelnamn', class: 'input'});
+nameBox.index = i;
+nameBox.oldName = '';
+nameBox.addEvent('change', function(e) {
+CM.State.Variables[this.value] = $('varSel'+this.index).value;
+delete CM.State.Variables[this.oldName];
+CM.UIManager.RenameVariable(this.oldName, this.value);
+this.oldName = this.value;
+});
+var valueSelect = new Element('select', {id: 'varSel' + i, class: 'input'}).adopt(new Element('option', {value: 0, text: '0'}), new Element('option', {value: 1, text: '1'}));
       valueSelect.index = i;
       valueSelect.addEvent('change', function(e) {
         CM.State.Variables[$('varTB' + this.index).value] = this.value;
         CM.Execute();
       });
-			nameCell.adopt(nameBox);
-			valueCell.adopt(valueSelect);
-			row.adopt([nameCell, valueCell]);
-		},
-		InitVariableElements: function() {
-		  $('varTable').empty();
-			for(var i = 0; i < CM.Settings.VariableCount; i++) {
-			  CM.UIManager.AddVariable();
-			}
-		},
+nameCell.adopt(nameBox);
+valueCell.adopt(valueSelect);
+row.adopt([nameCell, valueCell]);
+},
+InitVariableElements: function() {
+$('varTable').empty();
+for(var i = 0; i < CM.Settings.VariableCount; i++) {
+CM.UIManager.AddVariable();
+}
+},
     InitUI: function() {
       var keyboardListener = new Keyboard({
         active: true
@@ -203,43 +212,43 @@ CM.UIManager = function() {
       $('menuFileSave').addEvent('click', function(e) { CM.SaveFile(); });
       $('menuFileOpen').addEvent('click', function(e) {$('file').click();});
       $('newVarButton').addEvent('click', function(e) {CM.UIManager.AddVariable(); });
-			paper.setup($('dfCanvas'));
-			CM.UIManager.Context = $('dfCanvas').getContext('2d');
+paper.setup($('dfCanvas'));
+CM.UIManager.Context = $('dfCanvas').getContext('2d');
       CM.UIManager.KeyboardListener = keyboardListener;
       CM.UIManager.InitVariableElements();
-			$('executeButton').addEvent('click', function(e) {
-			  CM.Execute();
-			});
+$('executeButton').addEvent('click', function(e) {
+CM.Execute();
+});
       CM.GateTypes.each(function(gt) {
         //Add dragndrop gates to the view
         var li = new Element('li', {text: gt.prototype.name, class: 'gate'});
-				var e = gt.prototype.generateElement(false);
-				li.adopt(e);
-				li.setStyle('height', 35+gt.prototype.height+'px');
+var e = gt.prototype.generateElement(false);
+li.adopt(e);
+li.setStyle('height', 35+gt.prototype.height+'px');
         $('gateList').adopt(li);
-				var drag = new Drag.Move(e, {
-					snap: 0,
-					droppables: [$('dfArea')],
-					checkDroppables: true,
-					onDrop: function(el, droppable, e) {
-						if(droppable) {
-							var gate = new gt('u' + CM.State.GateCount);
-							CM.State.GateCount++;
-							CM.State.Gates[gate.id] = gate;
-							gate.place(el.getPosition($('dfArea')));
-							CM.UIManager.DrawLines();
-						}
-						el.removeClass('dragging');
-						el.setPosition(el.originalPosition);
-					},
-					onSnap: function(el) {
-					  if(!e.hasClass('dragging')) {
-						  el.addClass('dragging');
-						  el.originalPosition = el.getPosition();
-						}
-					}
-				});
-				//Add items to the menu
+var drag = new Drag.Move(e, {
+snap: 0,
+droppables: [$('dfArea')],
+checkDroppables: true,
+onDrop: function(el, droppable, e) {
+if(droppable) {
+var gate = new gt('u' + CM.State.GateCount);
+CM.State.GateCount++;
+CM.State.Gates[gate.id] = gate;
+gate.place(el.getPosition($('dfArea')));
+CM.UIManager.DrawLines();
+}
+el.removeClass('dragging');
+el.setPosition(el.originalPosition);
+},
+onSnap: function(el) {
+if(!e.hasClass('dragging')) {
+el.addClass('dragging');
+el.originalPosition = el.getPosition($('gateList'));
+}
+}
+});
+//Add items to the menu
         var li = new Element('li');
         var a = new Element('a', {href: '#', text: gt.prototype.name});
         a.addEvent('click', function(event) {
@@ -254,79 +263,88 @@ CM.UIManager = function() {
       });
       $('file').addEvent('change', handleFileSelect);
     },
-		DrawLines: function() {
-			CM.UIManager.Context.beginPath();
-			CM.UIManager.Context.clearRect(0, 0, CM.Settings.ViewWidth, CM.Settings.ViewHeight);
-			paper.project.activeLayer.removeChildren();
-			for(var id in CM.State.Gates) {
-				var gate = CM.State.Gates[id];
-				gate.inElements.each(function(input) {
-					if(input.value[0] == 'u' && input.value != id) {
-						var tg = CM.State.Gates[input.value]; //Target gate
-						var startCords = input.getCoordinates($('dfCanvas'));
-						var endCords = tg.element.getCoordinates($('dfCanvas'));
-            var path = new paper.Path();  
+DrawLines: function() {
+CM.UIManager.Context.beginPath();
+CM.UIManager.Context.clearRect(0, 0, CM.Settings.ViewWidth, CM.Settings.ViewHeight);
+paper.project.activeLayer.removeChildren();
+for(var id in CM.State.Gates) {
+var gate = CM.State.Gates[id];
+gate.inElements.each(function(input) {
+if(input.value[0] == 'u' && input.value != id && input.value != id + "'") {
+var tgID = input.value[input.value.length-1] == "'" ? input.value.slice(0, input.value.length-1) : input.value; //Also get ID for negated values, removing the '
+var tg = CM.State.Gates[tgID]; //Target gate
+var startCords = input.getCoordinates($('dfCanvas'));
+var endCords = tg.element.getCoordinates($('dfCanvas'));
+            var path = new paper.Path();
             var start = new paper.Point(startCords.left, startCords.top+startCords.height/2);
             var end = new paper.Point(endCords.left+endCords.width+20, endCords.top+endCords.height/2);
             path.strokeColor = $('output'+tg.id).getStyle('background-color');
             path.moveTo(start);
             var next = start.add([ -30, 0 ]);
             path.lineTo(next);
-            next = next.add(0,  - (start.y - end.y));
+            next = next.add(0, - (start.y - end.y));
             path.lineTo(next);
             path.lineTo(end.add([30, 0]));
             path.lineTo(end);
-					}
-				});
+}
+});
         paper.view.draw();
-			}
-		},
-		RenameVariable: function(oldName, newName) {
-		  $$('select').each(function(select) {
-		    if(typeof oldName !== undefined && oldName != '') {
-  		    var options = select.getElements('option');
-  		    for(var i in options) {
-  		      var o = options[i];
-  		      if(o.value == oldName) {
-  		        if(newName == '') {
-  		          o.dispose();
-  		        }
-  		        o.value = o.text = newName;
-  		        return;
-  		      }
-  		    }
-  	    }
-		    //If we get here, there is no existing option with the old name, so make a new one!
-		    select.adopt(new Element('option', {text: newName}));
-		  });
-		},
-		PlaceGate: function(gate) {
-			$('dfArea').adopt(gate.element);
-			for(var id in CM.State.Gates) {
-				var g = CM.State.Gates[id];
-				if(g !== gate) {
-  				gate.inElements.each(function(el) {
-  					var o = new Element('option', {text: g.id, value: g.id}); //Add other gates output to new gates input
-  					el.adopt(o);
-  				});
-				}
-				g.inElements.each(function(el) {
-				  for(var i = 0; i < el.options.length; i++) {
-				    if(el.options[i].value == gate.id) {
-				      return; //Do not add if gate already added (for file load when severla gates are initialized at the same time)
-				    }
-				  }
-					var o = new Element('option', {text: gate.id, value: gate.id}); //Add new gate as input for every gate
-					el.adopt(o);  				  
-				});
-			}
-			for(var key in CM.State.Variables) {
-				gate.inElements.each(function(el) {
-					var o = new Element('option', {text: key, value: key}); //Add variables to new gates input
-					el.adopt(o);
-				});
-			}
-		}
+}
+},
+RenameVariable: function(oldName, newName) {
+$$('select').each(function(select) {
+if(typeof oldName !== undefined && oldName != '') {
+   var options = select.getElements('option');
+   for(var i in options) {
+   var o = options[i];
+   if(o.value == oldName) {
+   if(newName == '') {
+   o.dispose();
+   }
+   o.value = o.text = newName;
+   } else if(o.value == oldName+"'") {
+   if(newName == '') {
+   o.dispose();
+   }
+   o.value = o.text = newName + "'";
+   }
+   }
+   } else {
+//If we get here, there is no existing option with the old name, so make a new one!
+select.adopt(new Element('option', {text: newName}), new Element('option', {text: newName+"'"}));
+}
+});
+},
+PlaceGate: function(gate) {
+$('dfArea').adopt(gate.element);
+for(var id in CM.State.Gates) {
+var g = CM.State.Gates[id];
+if(g !== gate) {
+   gate.inElements.each(function(el) {
+   var o = new Element('option', {text: g.id, value: g.id}); //Add other gates output to new gates input
+   var op = new Element('option', {text: g.id+"'", value: g.id+"'"}); //Add other gates output to new gates input
+   el.adopt(o, op);
+   });
+}
+g.inElements.each(function(el) {
+for(var i = 0; i < el.options.length; i++) {
+if(el.options[i].value == gate.id) {
+return; //Do not add if gate already added (for file load when several gates are initialized at the same time)
+}
+}
+var o = new Element('option', {text: gate.id, value: gate.id}); //Add new gate as input for every gate
+var op = new Element('option', {text: gate.id+"'", value: gate.id+"'"}); //Add new gate as input for every gate
+el.adopt(o, op);
+});
+}
+for(var key in CM.State.Variables) {
+gate.inElements.each(function(el) {
+var o = new Element('option', {text: key, value: key}); //Add variables to new gates input
+var op = new Element('option', {text: key+"'", value: key+"'"});
+el.adopt(o, op);
+});
+}
+}
   };
 }();
 
