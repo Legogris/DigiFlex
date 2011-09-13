@@ -37,8 +37,8 @@ span.nOutput {
 }
 #dfArea {
 background-color: #fff;
-width: 1000px;
-height: 800px;
+width: 800px;
+height: 600px;
 float: left;
 position: relative;
 }
@@ -63,4 +63,7 @@ left: 0;
   background-image: url('/images/plus-circle.png');
   cursor: hand;
   cursor: pointer;
+}
+#gateList {
+  position: relative;
 }
