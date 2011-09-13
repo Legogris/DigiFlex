@@ -2,8 +2,8 @@ if(CM === undefined) { var CM = {}; }
 
 CM.Settings = {
 	BackgroundColor: '#000',
-	ViewWidth: 800,
-	ViewHeight: 600,
+	ViewWidth: 1000,
+	ViewHeight: 800,
 	VariableCount: 4
 };
 
