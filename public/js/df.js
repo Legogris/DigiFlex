@@ -22,20 +22,28 @@ var CM = function() {
     Execute: function() {
       CM.State.Values =  { '0': 0, '1': 1 };
       var stillVars = true;
+      var emptyRuns = 0;
       while(stillVars) {
         stillVars = false;
+        emptyRuns++;
         for(var key in CM.State.Variables) {
           if(CM.State.Values[key] === undefined) {
             stillVars = true;
             var val = CM.State.Variables[key];
             if(CM.State.Values[val] !== undefined) {
+              emptyRuns = 0;
               CM.State.Values[key] = CM.State.Values[val];
+              CM.State.Values[key+"'"] = !CM.State.Values[val];
             } 
           }
         }
+        if(emptyRuns > 3) {
+          alert('Rekursiv variabeldefiniering är inte svalt, broder.');
+          return;
+        }
       }
       var stillGates = true;
-      var emptyRuns = 0;
+      emptyRuns = 0;
       while(stillGates) {
         stillGates = false;
         emptyRuns++;
@@ -58,6 +66,7 @@ var CM = function() {
             if(allDefined) {
               var result = gate.execute();
               CM.State.Values[gate.id] = result;
+              CM.State.Values[gate.id+"'"] = !result;
               $('output'+gate.id).setStyle('background-color', result ? 'red' : 'blue');
               emptyRuns = 0;
             }
@@ -235,7 +244,7 @@ CM.UIManager = function() {
 					onSnap: function(el) {
 					  if(!e.hasClass('dragging')) {
 						  el.addClass('dragging');
-						  el.originalPosition = el.getPosition();
+						  el.originalPosition = el.getPosition($('gateList'));
 						}
 					}
 				});
@@ -261,8 +270,9 @@ CM.UIManager = function() {
 			for(var id in CM.State.Gates) {
 				var gate = CM.State.Gates[id];
 				gate.inElements.each(function(input) {
-					if(input.value[0] == 'u' && input.value != id) {
-						var tg = CM.State.Gates[input.value]; //Target gate
+					if(input.value[0] == 'u' && input.value != id && input.value != id + "'") {
+					  var tgID = input.value[input.value.length-1] == "'" ? input.value.slice(0, input.value.length-1) : input.value; //Also get ID for negated values, removing the '
+						var tg = CM.State.Gates[tgID]; //Target gate
 						var startCords = input.getCoordinates($('dfCanvas'));
 						var endCords = tg.element.getCoordinates($('dfCanvas'));
             var path = new paper.Path();  
@@ -292,12 +302,17 @@ CM.UIManager = function() {
   		          o.dispose();
   		        }
   		        o.value = o.text = newName;
-  		        return;
+  		      } else if(o.value == oldName+"'") {
+  		        if(newName == '') {
+  		          o.dispose();
+  		        }
+  		        o.value = o.text = newName + "'";
   		      }
   		    }
-  	    }
-		    //If we get here, there is no existing option with the old name, so make a new one!
-		    select.adopt(new Element('option', {text: newName}));
+  	    } else {
+		      //If we get here, there is no existing option with the old name, so make a new one!
+		      select.adopt(new Element('option', {text: newName}), new Element('option', {text: newName+"'"}));
+	      }
 		  });
 		},
 		PlaceGate: function(gate) {
@@ -307,23 +322,26 @@ CM.UIManager = function() {
 				if(g !== gate) {
   				gate.inElements.each(function(el) {
   					var o = new Element('option', {text: g.id, value: g.id}); //Add other gates output to new gates input
-  					el.adopt(o);
+  					var op = new Element('option', {text: g.id+"'", value: g.id+"'"}); //Add other gates output to new gates input
+  					el.adopt(o, op);
   				});
 				}
 				g.inElements.each(function(el) {
 				  for(var i = 0; i < el.options.length; i++) {
 				    if(el.options[i].value == gate.id) {
-				      return; //Do not add if gate already added (for file load when severla gates are initialized at the same time)
+				      return; //Do not add if gate already added (for file load when several gates are initialized at the same time)
 				    }
 				  }
 					var o = new Element('option', {text: gate.id, value: gate.id}); //Add new gate as input for every gate
-					el.adopt(o);  				  
+					var op = new Element('option', {text: gate.id+"'", value: gate.id+"'"}); //Add new gate as input for every gate
+					el.adopt(o, op);  				  
 				});
 			}
 			for(var key in CM.State.Variables) {
 				gate.inElements.each(function(el) {
 					var o = new Element('option', {text: key, value: key}); //Add variables to new gates input
-					el.adopt(o);
+					var op = new Element('option', {text: key+"'", value: key+"'"}); 
+					el.adopt(o, op);
 				});
 			}
 		}
